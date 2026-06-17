@@ -21,7 +21,7 @@ export default function VendedoresPage() {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [qrModal, setQrModal] = useState<{ id: string; name: string; qrDataUrl: string } | null>(null);
-  const [editModal, setEditModal] = useState<{ id: string; name: string; email: string; phone: string; description: string; location: string; title: string; position: string; specialties: string } | null>(null);
+  const [editModal, setEditModal] = useState<{ id: string; name: string; email: string; phone: string; description: string; location: string; title: string; position: string; specialties: string; rating: number; responseFrequency: string } | null>(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -88,6 +88,8 @@ export default function VendedoresPage() {
       title: (user as any).title || '',
       position: (user as any).position || '',
       specialties: (user as any).specialties || '',
+      rating: (user as any).rating || 0,
+      responseFrequency: (user as any).responseFrequency || '',
     });
   };
 
@@ -110,6 +112,8 @@ export default function VendedoresPage() {
           title: editModal.title,
           position: editModal.position,
           specialties: editModal.specialties,
+          rating: editModal.rating,
+          responseFrequency: editModal.responseFrequency,
         }),
       });
       setEditModal(null);
@@ -300,6 +304,28 @@ export default function VendedoresPage() {
                   onChange={e => setEditModal({...editModal, specialties: e.target.value})}
                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
                   placeholder="Separadas por coma"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Calificación</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={editModal.rating}
+                  onChange={e => setEditModal({...editModal, rating: parseFloat(e.target.value) || 0})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Frecuencia de Respuesta</label>
+                <input
+                  type="text"
+                  value={editModal.responseFrequency}
+                  onChange={e => setEditModal({...editModal, responseFrequency: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
+                  placeholder="Ej: 24 horas, 48 horas"
                 />
               </div>
               <div className="flex gap-3 pt-4">
