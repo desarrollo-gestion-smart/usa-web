@@ -196,11 +196,11 @@ export default function ClientesPage() {
       formData.append('userId', assignModal.userId);
       formData.append('userEmail', assignModal.userEmail);
       formData.append('contractDate', assignModal.contractDate);
-      formData.append('monthpay', assignModal.monthpay ? parseFloat(assignModal.monthpay) : 0);
+      formData.append('monthpay', assignModal.monthpay ? String(parseFloat(assignModal.monthpay)) : '0');
       formData.append('serviceType', assignModal.selectedService.type);
       formData.append('policyNumber', assignModal.policyNumber);
       formData.append('status', assignModal.status);
-      formData.append('coverageAmount', assignModal.coverageAmount ? parseFloat(assignModal.coverageAmount) : 0);
+      formData.append('coverageAmount', assignModal.coverageAmount ? String(parseFloat(assignModal.coverageAmount)) : '0');
       formData.append('notes', assignModal.notes);
       formData.append('beneficiaryName', assignModal.userName);
       formData.append('beneficiaryPhone', assignModal.userPhone);
