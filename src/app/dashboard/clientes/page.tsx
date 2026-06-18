@@ -73,6 +73,10 @@ export default function ClientesPage() {
     policyNumber: string;
     notes: string;
     coverageAmount: string;
+    monthpay: string;
+    documents: File[];
+    images: File[];
+    companyName: string;
   } | null>(null);
   const [viewModal, setViewModal] = useState<UserDetail | null>(null);
   const [assigning, setAssigning] = useState(false);
@@ -163,6 +167,10 @@ export default function ClientesPage() {
       policyNumber: '',
       notes: '',
       coverageAmount: '',
+      monthpay: '',
+      documents: [],
+      images: [],
+      companyName: '',
     });
   };
 
@@ -183,27 +191,30 @@ export default function ClientesPage() {
     if (!token || !assignModal || !assignModal.selectedService) return;
     setAssigning(true);
     try {
+      const formData = new FormData();
+      formData.append('serviceName', assignModal.serviceName);
+      formData.append('userId', assignModal.userId);
+      formData.append('userEmail', assignModal.userEmail);
+      formData.append('contractDate', assignModal.contractDate);
+      formData.append('monthpay', assignModal.monthpay);
+      formData.append('serviceType', assignModal.selectedService.type);
+      formData.append('policyNumber', assignModal.policyNumber);
+      formData.append('status', assignModal.status);
+      formData.append('coverageAmount', assignModal.coverageAmount);
+      formData.append('notes', assignModal.notes);
+      formData.append('beneficiaryName', assignModal.userName);
+      formData.append('beneficiaryPhone', assignModal.userPhone);
+      formData.append('currency', assignModal.currency);
+      formData.append('catalogItemId', assignModal.selectedService.id);
+      formData.append('companyName', assignModal.companyName);
+
+      assignModal.documents.forEach(file => formData.append('files', file));
+      assignModal.images.forEach(file => formData.append('files', file));
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/services`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: assignModal.userId,
-          userEmail: assignModal.userEmail,
-          serviceName: assignModal.serviceName,
-          serviceType: assignModal.selectedService.type,
-          policyNumber: assignModal.policyNumber,
-          contractDate: assignModal.contractDate,
-          status: assignModal.status,
-          coverageAmount: parseFloat(assignModal.coverageAmount),
-          notes: assignModal.notes,
-          beneficiaryName: assignModal.userName,
-          beneficiaryPhone: assignModal.userPhone,
-          currency: assignModal.currency,
-          catalogItemId: assignModal.selectedService.id,
-        }),
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
       const data = await res.json();
       console.log('Assign service response:', data);
@@ -356,6 +367,16 @@ export default function ClientesPage() {
                   </div>
 
                   <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la Compañía</label>
+                    <input
+                      type="text"
+                      value={assignModal.companyName}
+                      onChange={(e) => setAssignModal({...assignModal, companyName: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
+                    />
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Moneda</label>
                     <select
                       value={assignModal.currency}
@@ -416,12 +437,44 @@ export default function ClientesPage() {
                   </div>
 
                   <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Pago Mensual</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={assignModal.monthpay}
+                      onChange={(e) => setAssignModal({...assignModal, monthpay: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
+                    />
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Notas</label>
                     <textarea
                       value={assignModal.notes}
                       onChange={(e) => setAssignModal({...assignModal, notes: e.target.value})}
                       className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
                       rows={3}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Documentos</label>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={(e) => setAssignModal({...assignModal, documents: Array.from(e.target.files || [])})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Imágenes</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => setAssignModal({...assignModal, images: Array.from(e.target.files || [])})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
                     />
                   </div>
                 </>
