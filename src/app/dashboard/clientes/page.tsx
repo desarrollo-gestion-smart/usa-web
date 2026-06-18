@@ -31,14 +31,18 @@ interface ServiceItem {
   serviceType: string;
   policyNumber: string;
   contractDate: string;
-  expiryDate: string;
+  expiryDate: string | null;
   status: string;
   coverageAmount: number;
-  premiumAmount: number;
+  premiumAmount: number | null;
   currency: string;
-  notes: string;
+  notes: string | null;
   beneficiaryName: string;
   beneficiaryPhone: string;
+  monthpay: number | null;
+  companyName: string | null;
+  serviceImages: string[];
+  serviceDocuments: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -561,6 +565,12 @@ export default function ClientesPage() {
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
+                      {service.companyName && (
+                        <div>
+                          <p className="text-slate-500">Compañía</p>
+                          <p className="text-slate-900">{service.companyName}</p>
+                        </div>
+                      )}
                       <div>
                         <p className="text-slate-500">Póliza</p>
                         <p className="text-slate-900">{service.policyNumber}</p>
@@ -573,18 +583,28 @@ export default function ClientesPage() {
                         <p className="text-slate-500">Cobertura</p>
                         <p className="text-slate-900">${service.coverageAmount.toLocaleString()}</p>
                       </div>
-                      <div>
-                        <p className="text-slate-500">Premio</p>
-                        <p className="text-slate-900">${service.premiumAmount?.toLocaleString() || '0'}</p>
-                      </div>
+                      {service.monthpay != null && (
+                        <div>
+                          <p className="text-slate-500">Pago Mensual</p>
+                          <p className="text-slate-900">${service.monthpay.toLocaleString()}</p>
+                        </div>
+                      )}
+                      {service.premiumAmount != null && (
+                        <div>
+                          <p className="text-slate-500">Premio</p>
+                          <p className="text-slate-900">${service.premiumAmount.toLocaleString()}</p>
+                        </div>
+                      )}
                       <div>
                         <p className="text-slate-500">Fecha de Contratación</p>
-                        <p className="text-slate-900">{service.contractDate}</p>
+                        <p className="text-slate-900">{new Date(service.contractDate).toLocaleDateString()}</p>
                       </div>
-                      <div>
-                        <p className="text-slate-500">Fecha de Vencimiento</p>
-                        <p className="text-slate-900">{service.expiryDate}</p>
-                      </div>
+                      {service.expiryDate && (
+                        <div>
+                          <p className="text-slate-500">Fecha de Vencimiento</p>
+                          <p className="text-slate-900">{new Date(service.expiryDate).toLocaleDateString()}</p>
+                        </div>
+                      )}
                       {service.beneficiaryName && (
                         <div>
                           <p className="text-slate-500">Beneficiario</p>
@@ -602,6 +622,30 @@ export default function ClientesPage() {
                       <div className="mt-3 pt-3 border-t border-slate-100">
                         <p className="text-slate-500 text-sm">Notas</p>
                         <p className="text-slate-900 text-sm">{service.notes}</p>
+                      </div>
+                    )}
+                    {service.serviceImages && service.serviceImages.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-slate-100">
+                        <p className="text-slate-500 text-sm mb-2">Imágenes</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {service.serviceImages.map((img, idx) => (
+                            <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 text-sm underline">
+                              Ver imagen {idx + 1}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {service.serviceDocuments && service.serviceDocuments.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-slate-100">
+                        <p className="text-slate-500 text-sm mb-2">Documentos</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {service.serviceDocuments.map((doc, idx) => (
+                            <a key={idx} href={doc} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 text-sm underline">
+                              Ver documento {idx + 1}
+                            </a>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
