@@ -90,12 +90,23 @@ export default function PublicidadesPage() {
       Object.entries(form).forEach(([key, value]) => formData.append(key, value));
       if (imageFile) formData.append('image', imageFile);
 
+      console.log('=== Enviando publicidad al backend ===');
+      for (const [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value instanceof File ? `{file: ${value.name}, size: ${value.size}}` : value);
+      }
+
       const res = await fetch('/api/admin/recommendations', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
+
+      console.log('=== Respuesta del backend ===');
+      console.log('  Status:', res.status);
+
       const data = await res.json();
+      console.log('  Body:', data);
+
       if (res.ok) {
         setShowForm(false);
         setForm({ title: '', subtitle: '', type: 'instagram', ctaLink: '', active: 'true' });
