@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,6 +14,8 @@ const sections = [
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [successModal, setSuccessModal] = useState<string | null>(null);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -26,16 +28,23 @@ export default function DashboardPage() {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/logout`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/logout`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.ok) {
+          localStorage.removeItem('token');
+          router.push('/login');
+        } else {
+          setErrorModal('Error al cerrar sesión');
+        }
       } catch (err) {
         console.error('Logout error', err);
+        setErrorModal('Error al conectar con el servidor');
       }
+    } else {
+      router.push('/login');
     }
-    localStorage.removeItem('token');
-    router.push('/login');
   };
 
   return (
@@ -82,6 +91,46 @@ export default function DashboardPage() {
           ))}
         </div>
       </main>
+
+      {successModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSuccessModal(null)}>
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center" onClick={e => e.stopPropagation()}>
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">¡Éxito!</h3>
+            <p className="text-slate-600 mb-6">{successModal}</p>
+            <button
+              onClick={() => setSuccessModal(null)}
+              className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {errorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setErrorModal(null)}>
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center" onClick={e => e.stopPropagation()}>
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Error</h3>
+            <p className="text-slate-600 mb-6">{errorModal}</p>
+            <button
+              onClick={() => setErrorModal(null)}
+              className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

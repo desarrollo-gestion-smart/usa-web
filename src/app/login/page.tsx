@@ -8,12 +8,11 @@ export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorModal, setErrorModal] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -26,13 +25,14 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error en el login');
+        setErrorModal(data.message || 'Error en el login');
+        return;
       }
 
       localStorage.setItem('token', data.token);
       router.push('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      setErrorModal(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
       setLoading(false);
     }
@@ -80,12 +80,6 @@ export default function LoginPage() {
             <p className="text-slate-500 mt-2">Accede con tus credenciales de administrador</p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
@@ -127,6 +121,26 @@ export default function LoginPage() {
           </form>
         </div>
       </div>
+
+      {errorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setErrorModal(null)}>
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center" onClick={e => e.stopPropagation()}>
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Error</h3>
+            <p className="text-slate-600 mb-6">{errorModal}</p>
+            <button
+              onClick={() => setErrorModal(null)}
+              className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

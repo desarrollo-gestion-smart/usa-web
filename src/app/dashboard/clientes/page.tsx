@@ -80,6 +80,8 @@ export default function ClientesPage() {
   } | null>(null);
   const [viewModal, setViewModal] = useState<UserDetail | null>(null);
   const [assigning, setAssigning] = useState(false);
+  const [successModal, setSuccessModal] = useState<string | null>(null);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -243,7 +245,13 @@ export default function ClientesPage() {
       console.log('=== RESPUESTA DEL BACKEND ===');
       console.log(' Status:', res.status);
       console.log(' Data:', data);
-      setAssignModal(null);
+
+      if (res.ok) {
+        setAssignModal(null);
+        setSuccessModal(data.message || 'Servicio asignado exitosamente');
+      } else {
+        setErrorModal(data.error?.message || 'Error al asignar servicio');
+      }
     } catch (err) {
       console.error('Error assigning service', err);
     } finally {
@@ -606,6 +614,46 @@ export default function ClientesPage() {
               className="w-full mt-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
             >
               Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {successModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSuccessModal(null)}>
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center" onClick={e => e.stopPropagation()}>
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">¡Éxito!</h3>
+            <p className="text-slate-600 mb-6">{successModal}</p>
+            <button
+              onClick={() => setSuccessModal(null)}
+              className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {errorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setErrorModal(null)}>
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center" onClick={e => e.stopPropagation()}>
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Error</h3>
+            <p className="text-slate-600 mb-6">{errorModal}</p>
+            <button
+              onClick={() => setErrorModal(null)}
+              className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Aceptar
             </button>
           </div>
         </div>
