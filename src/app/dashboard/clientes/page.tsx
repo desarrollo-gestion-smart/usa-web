@@ -211,13 +211,38 @@ export default function ClientesPage() {
       assignModal.documents.forEach(file => formData.append('files', file));
       assignModal.images.forEach(file => formData.append('files', file));
 
+      console.log('=== ENVIANDO DATOS AL BACKEND ===');
+      console.log(' Campos:', {
+        serviceName: assignModal.serviceName,
+        userId: assignModal.userId,
+        userEmail: assignModal.userEmail,
+        contractDate: assignModal.contractDate,
+        monthpay: assignModal.monthpay,
+        serviceType: assignModal.selectedService.type,
+        policyNumber: assignModal.policyNumber,
+        status: assignModal.status,
+        coverageAmount: assignModal.coverageAmount,
+        notes: assignModal.notes,
+        beneficiaryName: assignModal.userName,
+        beneficiaryPhone: assignModal.userPhone,
+        currency: assignModal.currency,
+        catalogItemId: assignModal.selectedService.id,
+        companyName: assignModal.companyName,
+      });
+      console.log(' Archivos:', {
+        documents: assignModal.documents.map(f => f.name),
+        images: assignModal.images.map(f => f.name),
+      });
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/services`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
       const data = await res.json();
-      console.log('Assign service response:', data);
+      console.log('=== RESPUESTA DEL BACKEND ===');
+      console.log(' Status:', res.status);
+      console.log(' Data:', data);
       setAssignModal(null);
     } catch (err) {
       console.error('Error assigning service', err);
