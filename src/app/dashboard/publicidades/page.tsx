@@ -234,9 +234,9 @@ export default function PublicidadesPage() {
           <div className="space-y-4">
             {items.map((item) => (
               <div key={item.id} className="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-6 hover:shadow-lg transition-shadow">
-                <div className="w-20 h-20 rounded-lg flex-shrink-0 overflow-hidden bg-slate-100">
+                <div className="w-40 h-[70px] rounded-lg flex-shrink-0 overflow-hidden bg-slate-100">
                   {item.imageUrl && (
-                    <Image src={item.imageUrl} alt={item.title} width={80} height={80} className="object-cover" />
+                    <Image src={item.imageUrl} alt={item.title} width={160} height={56} className="object-cover w-full h-full" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
